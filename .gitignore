@@ -1,0 +1,8 @@
+# env
+src/.env
+
+# node moudles
+node_modules/
+
+# package-lock
+package-lock.json
