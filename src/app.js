@@ -1,7 +1,7 @@
 const express = require('express');
 // const session = require('express-session');
-const authRoutes = require('./routes/authRoutes'); // auth 관련 import
-const connection = require('./config/dbConfig');
+const authRoutes = require('./routes/auth_routes'); // auth 관련 import
+const unauthRoutes = require('./routes/unauth_routes'); // auth 관련 import
 require('dotenv').config();
 
 
@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/unauth', unauthRoutes);
 
 const PORT = process.env.PORT || 8000;
 
