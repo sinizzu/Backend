@@ -28,6 +28,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const user = await userService.authenticateUser(req.body);
+    console.log(user)
     if (!user) {
       return res.status(401).json({
         resultCode: 401,
