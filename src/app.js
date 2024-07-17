@@ -15,6 +15,7 @@ console.log(MAIN_FRONTEND_URL);
 const whitelist = [
   MAIN_FRONTEND_URL,
   'http://localhost:8000',
+  'http://localhost:8500',
 ];
 
 // CORS 설정 추가
