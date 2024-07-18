@@ -1,56 +1,81 @@
 const userService = require('../services/userService');
-const jwt = require('jsonwebtoken');
+const { httpsAgent, PROXY_ADDR1, PROXY_ADDR2 } = require('../config/proxyConfig');
+const handleError = require('../utils/handleError');
+const axios = require('axios');
 
-exports.register = async (req, res) => {
+
+exports.signup = async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const { userId, passWord, email, name } = req.body;
-    const user = await userService.createUser({ userId, passWord, email, name });
-    res.status(201).json({
-      resultCode: 201,
-      data: {
-        user: { id: user.uid, userId: user.userId, email: user.email }
-      }
-    })
-  } catch (error) {
-    res.status(400).json({
-      resultCode: 400,
-      data: {
-        message: error.message
-      }
-    }
+    const response = await axios.post(
+      `${PROXY_ADDR2}/auth/signup`,
+      { email, password }
     );
+
+    res.status(response.status).send(response.data); //201, 400, 409(중복)
+  } catch (error) {
+    handleError.handleError(error, res);
   }
 };
 
 
 
-
 exports.login = async (req, res) => {
-  try {
-    const user = await userService.authenticateUser(req.body);
-    console.log(user)
-    if (!user) {
-      return res.status(401).json({
-        resultCode: 401,
-        data: {
-          message: 'Invalid credentials'
-        }
-      });
-    }
+  const { email, password } = req.body;
 
-    const token = jwt.sign({ uid: user.uid, user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({
-      resultCode: 200,
-      data: {
-        token
-      }
-    });
+  try {
+    const response = await axios.post(
+      `${PROXY_ADDR2}/auth/login`,
+      { email, password }
+    );
+
+
+    res.status(response.status).send(response.data); //200, 400, 401(unauthorized), accessToken, refreshToken
   } catch (error) {
-    res.status(400).json({
-      resultCode: 400,
-      data: {
-        message: error.message
+    handleError.handleError(error, res);
+  }
+};
+
+
+exports.refresh = async (req, res) => {
+  const { refreshToken } = req.body;
+  try {
+    const response = await axios.post(
+      `${PROXY_ADDR2}/auth/refresh`,
+      { refreshToken },
+      {
+        headers: {
+          'Authorization': `Bearer ${req.headers['authorization'].split(' ')[1]}`, //authorization: Bearer <Access Token>
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
+
+    res.status(response.status).send(response.data);  //200, 400, 401(unauthorized), accessToken, refreshToken
+  } catch (error) {
+    handleError.handleError(error, res);
+  }
+};
+
+
+
+// refreshToken 무효화
+exports.logout = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  try {
+    const response = await axios.post(
+      `${PROXY_ADDR2}/auth/logout`,
+      { refreshToken },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${req.headers['authorization'].split(' ')[1]}` //authorization: Bearer <Access Token>
+        },
+      }
+    );
+    res.status(response.status).send(response.data);  //204
+  } catch (error) {
+    handleError.handleError(error, res);
   }
 };
