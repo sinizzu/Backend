@@ -4,18 +4,22 @@ const express = require('express');
 const authRoutes = require('./routes/auth_routes'); // auth 관련 import
 const unauthRoutes = require('./routes/unauth_routes'); // auth 관련 import
 const cors = require('cors');
+const connectDB = require('./config/mongodb');
 
 
 
 const PORT = process.env.PORT || 8000;
 
 const MAIN_FRONTEND_URL = process.env.MAIN_FRONTEND_URL;
+const MAIN_BACKEND_URL = process.env.MAIN_BACKEND_URL;
 console.log(MAIN_FRONTEND_URL);
 
 const whitelist = [
   MAIN_FRONTEND_URL,
+  MAIN_BACKEND_URL,
   'http://localhost:8000',
   'http://localhost:8500',
+
 ];
 
 
@@ -54,6 +58,13 @@ app.use('/api/unauth', unauthRoutes);
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
+});
+
+
+app.get('/', (req, res) => {
+  res.sendFile(
+    '/work/MainBackend/test/index.html'
+  );
 });
 
 
