@@ -5,6 +5,11 @@ async function getS3Collection() {
     return db.collection('s3');
 }
 
+async function getChatCollection() {
+    const db = await connectDB();
+    return db.collection('chat');
+}
+
 
 
 async function saveS3Info(uuid, url, email) {
@@ -25,7 +30,28 @@ async function getS3InfoByEmail(email) {
     return s3Collection.find({ email }).toArray();
 }
 
+
+async function saveChatHistory(uuid, message, sender, email) {
+    const chatCollection = await getChatCollection();
+    const result = await chatCollection.insertOne({ uuid, message, sender, email, time: new Date() });
+    return { _id: result.insertedId, uuid, message, sender, email, time: new Date() };
+}
+
+
+async function getChatHistoryByUUIDAndEmail(uuid, email, sender) {
+    const chatCollection = await getChatCollection();
+    const query = { uuid, email };
+    if (sender) {
+        query.sender = sender;
+    }
+    const result = await chatCollection.find(query).sort({ time: 1 }).toArray();
+    return result;
+}
+
+
 module.exports = {
     saveS3Info,
     getS3InfoByEmail,
+    saveChatHistory,
+    getChatHistoryByUUIDAndEmail
 };

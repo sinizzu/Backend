@@ -42,6 +42,23 @@
         <button type="submit">Import</button>
     </form>
 
+    <h2>Save Chat</h2>
+    <form id="saveChatForm">
+        <input type="text" id="chatUUID" placeholder="UUID" required>
+        <input type="text" id="chatMessage" placeholder="Message" required>
+        <input type="text" id="chatSender" placeholder="Sender" required>
+        <input type="email" id="chatEmail" placeholder="Email" required>
+        <button type="submit">Save Chat</button>
+    </form>
+
+    <h2>Get Chat History</h2>
+    <form id="getChatHistoryForm">
+        <input type="text" id="historyUUID" placeholder="UUID" required>
+        <input type="email" id="historyEmail" placeholder="Email" required>
+        <input type="text" id="historySender" placeholder="Sender (optional)">
+        <button type="submit">Get History</button>
+    </form>
+
     <script>
         async function apiRequest(url, method, body, isFormData = false) {
             const headers = {
@@ -111,6 +128,29 @@
             event.preventDefault();
             const email = document.getElementById('importS3Email').value;
             const response = await apiRequest(`/api/auth/importS3?email=${email}`, 'GET');
+            console.log(response);
+        });
+
+        document.getElementById('saveChatForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const uuid = document.getElementById('chatUUID').value;
+            const message = document.getElementById('chatMessage').value;
+            const sender = document.getElementById('chatSender').value;
+            const email = document.getElementById('chatEmail').value;
+            const response = await apiRequest('/api/auth/saveChat', 'POST', JSON.stringify({ uuid, message, sender, email }));
+            console.log(response);
+        });
+
+        document.getElementById('getChatHistoryForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const uuid = document.getElementById('historyUUID').value;
+            const email = document.getElementById('historyEmail').value;
+            const sender = document.getElementById('historySender').value;
+            let url = `/api/auth/importChat?uuid=${uuid}&email=${email}`;
+            if (sender) {
+                url += `&sender=${sender}`;
+            }
+            const response = await apiRequest(url, 'GET');
             console.log(response);
         });
     </script>
