@@ -18,6 +18,7 @@ async function uploadS3(req, res) {
 async function saveS3(req, res) {
   try {
       const { uuid, url, email } = req.body;
+      console.log(uuid, url, email);
       const result = await historyService.saveS3Info(uuid, url, email);
 
       res.status(201).json({

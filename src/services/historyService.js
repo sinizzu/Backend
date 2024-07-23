@@ -27,7 +27,7 @@ async function saveS3Info(uuid, url, email) {
 
 async function getS3InfoByEmail(email) {
     const s3Collection = await getS3Collection();
-    return s3Collection.find({ email }).toArray();
+    return s3Collection.find({ email }).sort({ uploadedAt: -1 }).toArray();
 }
 
 

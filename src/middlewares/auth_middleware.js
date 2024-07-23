@@ -5,6 +5,7 @@ const { PROXY_ADDR2 } = require('../config/proxyConfig');
 
 const authenticateToken = async (req, res, next) => {
   try {
+    console.log(req.headers['authorization']);
     const token = req.headers['authorization'].split(' ')[1]; // Bearer <token>
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
