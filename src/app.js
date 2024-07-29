@@ -21,7 +21,7 @@ const whitelist = [
   TEST_FRONTEND_URL,
   'http://localhost:8000',
   'http://localhost:8500',
-
+  'http://172.28.54.158:8500'
 ];
 
 
@@ -34,7 +34,7 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'))
     }
   },
-  methods: ['GET','POST','DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200
 };
@@ -63,11 +63,11 @@ app.listen(PORT, async () => {
 });
 
 
-app.get('/', (req, res) => {
-  res.sendFile(
-    '/work/MainBackend/test/index.html'
-  );
-});
+// app.get('/', (req, res) => {
+//   res.sendFile(
+//     '/test/index.html'
+//   );
+// });
 
 
 
