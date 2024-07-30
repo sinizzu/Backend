@@ -49,9 +49,25 @@ async function getChatHistoryByUUIDAndEmail(uuid, email, sender) {
 }
 
 
+async function deleteS3Info(uuid, email) {
+    const s3Collection = await getS3Collection();
+    try {
+        const result = await s3Collection.deleteOne({ uuid, email });
+        if (result.deletedCount === 0) {
+            throw new Error('No document found with the provided uuid and email');
+        }
+        return { message: 'MongoDB record deleted successfully' };
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     saveS3Info,
     getS3InfoByEmail,
     saveChatHistory,
-    getChatHistoryByUUIDAndEmail
+    getChatHistoryByUUIDAndEmail,
+    deleteS3Info
 };

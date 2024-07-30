@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Test</title>
 </head>
+
 <body>
     <h1>API Test</h1>
 
@@ -26,6 +28,12 @@
     <form id="uploadForm" enctype="multipart/form-data">
         <input type="file" id="uploadFile" name="file" required>
         <button type="submit">Upload</button>
+    </form>
+
+    <h2>Generate Presigned URL & Upload</h2>
+    <form id="presignedUrlForm" enctype="multipart/form-data">
+        <input type="file" id="presignedFile" name="file" required>
+        <button type="submit">Generate & Upload</button>
     </form>
 
     <h2>Save S3</h2>
@@ -73,7 +81,7 @@
                 headers: headers,
                 body: body
             };
-            
+
             if (isFormData) {
                 delete options.headers['Content-Type']; // Let the browser set the Content-Type header for FormData
             }
@@ -104,15 +112,53 @@
         document.getElementById('uploadForm').addEventListener('submit', async (event) => {
             event.preventDefault();
             const formData = new FormData();
+            const startTime = Date.now();
             formData.append('file', document.getElementById('uploadFile').files[0]);
             const response = await fetch('/api/auth/uploadS3', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: formData
-        }).then(res => res.json());
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: formData
+            }).then(res => res.json());
+            const endTime = Date.now();
+
+            console.log('File uploaded successfully');
+            console.log('Upload time:', endTime - startTime);
+
             console.log(response);
+
+        });
+
+
+        document.getElementById('presignedUrlForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const startTime = Date.now();
+            // Generate presigned URL
+            const response = await apiRequest('/api/auth/generateS3', 'POST', JSON.stringify({ contentType: 'application/pdf' }));
+            const url = response.url;
+
+            // Upload the file to S3 using the presigned URL
+            const file = document.getElementById('presignedFile').files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const uploadResponse = await fetch(url, {
+                method: 'PUT',
+                body: file
+            });
+
+            const endTime = Date.now();
+
+            console.log('File uploaded successfully');
+            console.log('Upload time:', endTime - startTime);
+
+            if (uploadResponse.ok) {
+                console.log('File uploaded successfully');
+            } else {
+                console.error('File upload failed');
+            }
         });
 
         document.getElementById('saveS3Form').addEventListener('submit', async (event) => {
@@ -155,4 +201,5 @@
         });
     </script>
 </body>
+
 </html>
