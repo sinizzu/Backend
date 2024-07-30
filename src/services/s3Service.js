@@ -38,6 +38,62 @@ async function uploadFileToS3(file) {
     }
 }
 
+
+async function uploadFileURLToS3(originalFileName) {
+    try {
+        const fileExtension = originalFileName.split('.').pop();
+
+        const fileNameWithoutExtension = originalFileName.replace(`.${fileExtension}`, '');
+        const uniqueId = uuid.v4();
+        const uniqueFileName = `${uniqueId}_${fileNameWithoutExtension}.${fileExtension}`;
+        const filePath = `${process.env.PREFIX}${uniqueFileName}`;
+        const name = `${uniqueId}_${fileNameWithoutExtension}`;
+
+
+        const params = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: filePath,
+            Expires: 60, // URL 유효기간 (초 단위)
+            ContentType: 'application/pdf'
+        };
+
+        const presignedUrl = await s3.getSignedUrlPromise('putObject', params);
+
+        return { uuid: name, url: presignedUrl, key: filePath };
+    } catch (error) {
+        if (error.code === 'CredentialsError') {
+            throw new Error("AWS credentials not available.");
+        } else if (error.code === 'PartialCredentialsError') {
+            throw new Error("Incomplete AWS credentials provided.");
+        } else {
+            throw new Error(error.message);
+        }
+    }
+}
+
+async function deleteFileFromS3(filePath) {
+    try {
+        const params = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: filePath,
+        };
+
+        await s3.deleteObject(params).promise();
+        return { message: 'File deleted successfully' };
+    } catch (error) {
+        if (error.code === 'CredentialsError') {
+            throw new Error("AWS credentials not available.");
+        } else if (error.code === 'PartialCredentialsError') {
+            throw new Error("Incomplete AWS credentials provided.");
+        } else {
+            throw new Error(error.message);
+        }
+    }
+}
+
+
 module.exports = {
-    uploadFileToS3
+    uploadFileToS3,
+    uploadFileURLToS3,
+    deleteFileFromS3
 };

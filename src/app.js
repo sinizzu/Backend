@@ -63,11 +63,11 @@ app.listen(PORT, async () => {
 });
 
 
-// app.get('/', (req, res) => {
-//   res.sendFile(
-//     '/test/index.html'
-//   );
-// });
+app.get('/', (req, res) => {
+  res.sendFile(
+    '/root/backup/Backend/test/index.html'
+  );
+});
 
 
 

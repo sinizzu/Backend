@@ -18,5 +18,7 @@ router.post('/saveS3', authenticateToken, s3Controller.saveS3); // 컬렉션 저
 router.get('/importS3', authenticateToken, s3Controller.importS3); // 컬렉션 조회
 router.post('/saveChat', authenticateToken, chatController.saveChat); // 컬렉션 저장
 router.get('/importChat', authenticateToken, chatController.getChatHistory); // 컬렉션 조회
+router.post('/generateS3', authenticateToken, s3Controller.generateS3);
+router.post('/deleteS3', authenticateToken, s3Controller.deleteS3);
 
 module.exports = router;
