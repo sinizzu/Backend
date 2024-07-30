@@ -1,6 +1,6 @@
 const s3 = require('../config/s3_config');
 const uuid = require('uuid');
-require('dotenv').config();
+// require('dotenv').config({ path: '../../.env' });
 
 
 async function uploadFileToS3(file) {

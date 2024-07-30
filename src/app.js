@@ -1,10 +1,11 @@
-require('dotenv').config();
+// require('dotenv').config({ path: '../.env' });
 const express = require('express');
 // const session = require('express-session');
 const authRoutes = require('./routes/auth_routes'); // auth 관련 import
 const unauthRoutes = require('./routes/unauth_routes'); // auth 관련 import
 const cors = require('cors');
 const connectDB = require('./config/mongodb');
+const path = require('path');
 
 
 
@@ -64,10 +65,7 @@ app.listen(PORT, async () => {
 
 
 app.get('/', (req, res) => {
-  res.sendFile(
-    '/root/backup/Backend/test/index.html'
-  );
+  res.sendFile(path.join(__dirname, '../test', 'index.html')); // __dirname은 현재파일이 위치한 디렉토리
 });
-
 
 

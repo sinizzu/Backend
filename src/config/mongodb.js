@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-require('dotenv').config();
+// require('dotenv').config({ path: '../../.env' });
 
 const uri = process.env.MONGO_DB_URL;
 const dbName = 'history';
