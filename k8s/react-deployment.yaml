@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react
+  template:
+    metadata:
+      labels:
+        app: react
+    spec:
+      containers:
+      - name: react
+        image: sinzng/frontend:v1
+        ports:
+        - containerPort: 8500
+        env:
+        - name: REACT_APP_MainFastAPI
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: REACT_APP_MainFastAPI
+        - name: REACT_APP_SubFastAPI
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: REACT_APP_SubFastAPI
+        - name: REACT_APP_API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: REACT_APP_API_BASE_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-service
+spec:
+  selector:
+    app: react
+  ports:
+    - protocol: TCP
+      port: 8500
+      targetPort: 8500
+  type: LoadBalancer

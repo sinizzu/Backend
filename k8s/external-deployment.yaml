@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: external
+  template:
+    metadata:
+      labels:
+        app: external
+    spec:
+      containers:
+      - name: external
+        image: wjdguswn1203/external:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: OPENAI_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: OPENAI_API_KEY
+        - name: DEEPL_AUTH_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DEEPL_AUTH_KEY
+        - name: HUGGINGFACE_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: HUGGINGFACE_API_KEY
+        - name: WCS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: WCS_URL
+        - name: WCS_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: WCS_API_KEY
+        - name: TEXTRAZOR_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: TEXTRAZOR_API_KEY
+        - name: CUSTOM_SEARCH_API
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: CUSTOM_SEARCH_API
+        - name: GOOGLE_CX
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: GOOGLE_CX
+        - name: JH_IP
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: JH_IP
+        - name: SUBFASTAPI_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: SUBFASTAPI_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-service
+spec:
+  selector:
+    app: external
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

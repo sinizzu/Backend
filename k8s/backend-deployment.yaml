@@ -1,0 +1,161 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: node-express
+        image: raminicano/node-app:v1
+        ports:
+        - containerPort: 8000
+        env:
+        - name: FASTAPI_EXTERNAL_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: FASTAPI_EXTERNAL_URL
+        - name: FASTAPI_SUMMARY_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: FASTAPI_SUMMARY_URL
+        - name: MAIN_FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: MAIN_FRONTEND_URL
+        - name: TEST_FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: TEST_FRONTEND_URL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: PORT
+        - name: PROXY_ADDR1
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: PROXY_ADDR1
+        - name: PROXY_ADDR2
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: PROXY_ADDR2
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: AWS_SECRET_ACCESS_KEY
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: AWS_REGION
+        - name: AWS_BUCKET_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: AWS_BUCKET_NAME
+        - name: PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: PREFIX
+        - name: MAIN_BACKEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: MAIN_BACKEND_URL
+        - name: MONGO_DB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: MONGO_DB_URL
+        - name: MONGO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: MONGO_PASSWORD
+      - name: jwt-auth-proxy
+        image: virtualzone/jwt-auth-proxy:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 8443
+        volumeMounts:
+        - name: certs
+          mountPath: /app/certs
+        env:
+        - name: MONGO_DB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: MONGO_DB_URL
+        - name: PROXY_TARGET
+          value: 'http://node-express:8000'
+        - name: PROXY_BLACKLIST
+          value: '/api/auth'
+        - name: BACKEND_CERT_DIR
+          value: '/app/certs/'
+        - name: BACKEND_CERT_HOSTNAMES
+          value: 'proxy'
+        - name: ACCESS_TOKEN_LIFETIME
+          value: '30'
+      - name: mongo
+        image: mongo:4
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongo-persistent-storage
+          mountPath: /data/db
+      volumes:
+      - name: mongo-persistent-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+      - name: certs
+        hostPath:
+          path: /root/backup/Backend/certs
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+    - name: mongo
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
+    - name: http-auth
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: https-auth
+      protocol: TCP
+      port: 8443
+      targetPort: 8443
+    
