@@ -44,5 +44,5 @@ spec:
   ports:
     - protocol: TCP
       port: 8500
-      targetPort: 8500
-  type: LoadBalancer
+      nodePort: 30080
+  type: NodePort

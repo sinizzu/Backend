@@ -12,6 +12,13 @@ spec:
       labels:
         app: backend
     spec:
+      initContainers:
+      - name: init-mongo
+        image: busybox
+        command: ['sh', '-c', 'rm -f /data/db/mongod.lock']
+        volumeMounts:
+        - name: mongo-persistent-storage
+          mountPath: /data/db
       containers:
       - name: node-express
         image: raminicano/node-app:v1
@@ -88,11 +95,6 @@ spec:
             configMapKeyRef:
               name: app-config
               key: MONGO_DB_URL
-        - name: MONGO_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: app-secret
-              key: MONGO_PASSWORD
       - name: jwt-auth-proxy
         image: virtualzone/jwt-auth-proxy:latest
         ports:
