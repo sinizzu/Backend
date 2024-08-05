@@ -28,7 +28,7 @@ services:
       - mongo:/data/db
 
   node-app:
-    build: .
+    image: raminicano/node-app:latest
     ports:
       - 8000:8000
     networks:

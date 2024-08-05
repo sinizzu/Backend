@@ -28,18 +28,13 @@ console.log(MAIN_FRONTEND_URL);
 
 
 const corsOptions = {
-  // origin: function (origin, callback) {
-  //   if (whitelist.indexOf(origin) !== -1 || !origin) {
-  //     callback(null, true)
-  //   } else {
-  //     callback(new Error('Not allowed by CORS'))
-  //   }
-  // },
-  origin: '*',
+  origin: `${MAIN_FRONTEND_URL}`,
+  credentials: true, // 자격 증명(쿠키, 인증 헤더 등)을 포함
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200
 };
+
 
 
 
