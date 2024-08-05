@@ -12,29 +12,30 @@ const path = require('path');
 const PORT = process.env.PORT || 8000;
 
 const MAIN_FRONTEND_URL = process.env.MAIN_FRONTEND_URL;
-const MAIN_BACKEND_URL = process.env.MAIN_BACKEND_URL;
-const TEST_FRONTEND_URL = process.env.TEST_FRONTEND_URL;
+// const MAIN_BACKEND_URL = process.env.MAIN_BACKEND_URL;
+// const TEST_FRONTEND_URL = process.env.TEST_FRONTEND_URL;
 console.log(MAIN_FRONTEND_URL);
 
-const whitelist = [
-  MAIN_FRONTEND_URL,
-  MAIN_BACKEND_URL,
-  TEST_FRONTEND_URL,
-  'http://localhost:8000',
-  'http://localhost:8500',
-  'http://172.28.54.158:8500'
-];
+// const whitelist = [
+//   MAIN_FRONTEND_URL,
+//   MAIN_BACKEND_URL,
+//   TEST_FRONTEND_URL,
+//   'http://localhost:8000',
+//   'http://localhost:8500',
+//   'http://172.28.54.158:8500'
+// ];
 
 
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
+  // origin: function (origin, callback) {
+  //   if (whitelist.indexOf(origin) !== -1 || !origin) {
+  //     callback(null, true)
+  //   } else {
+  //     callback(new Error('Not allowed by CORS'))
+  //   }
+  // },
+  origin: '*',
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200

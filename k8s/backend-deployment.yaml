@@ -21,7 +21,7 @@ spec:
           mountPath: /data/db
       containers:
       - name: node-express
-        image: raminicano/node-app:v1
+        image: raminicano/node-app:latest
         ports:
         - containerPort: 8000
         env:

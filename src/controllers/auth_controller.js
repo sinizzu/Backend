@@ -59,8 +59,19 @@ exports.login = async (req, res) => {
 
     console.log(response.data);
 
+    const { otpRequired, accessToken, refreshToken } = response.data;
 
+    // Refresh token을 쿠키로 설정
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'Strict', // 또는 'Lax'
+      secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서만 secure 설정
+    });
+
+    // accessToken 및 기타 필요한 데이터를 응답으로 전송
     res.status(response.status).send(response.data); //200, 400, 401(unauthorized), accessToken, refreshToken
+
+
   } catch (error) {
 
     handleError.handleError(error, res);
