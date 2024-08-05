@@ -5,7 +5,9 @@ const authRoutes = require('./routes/auth_routes'); // auth 관련 import
 const unauthRoutes = require('./routes/unauth_routes'); // auth 관련 import
 const cors = require('cors');
 const connectDB = require('./config/mongodb');
+const cookieParser = require('cookie-parser');
 const path = require('path');
+
 
 
 
@@ -32,7 +34,8 @@ const corsOptions = {
   credentials: true, // 자격 증명(쿠키, 인증 헤더 등)을 포함
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  exposedHeaders: ['set-cookie']
 };
 
 
@@ -48,6 +51,8 @@ app.options('*', cors(corsOptions)); // Preflight 요청에 대한 응답 처리
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/unauth', unauthRoutes);
