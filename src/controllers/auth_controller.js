@@ -1,5 +1,6 @@
-const userService = require('../services/userService');
-const { httpsAgent, PROXY_ADDR1, PROXY_ADDR2 } = require('../config/proxyConfig');
+// const getObjectId = require('../services/historyService');
+// const { httpsAgent, PROXY_ADDR1, PROXY_ADDR2 } = require('../config/proxyConfig');
+const PROXY_ADDR2 = process.env.PROXY_ADDR2;
 const handleError = require('../utils/handleError');
 const axios = require('axios');
 const connectDB = require('../config/mongodbUser');
@@ -121,3 +122,51 @@ exports.logout = async (req, res) => {
     handleError.handleError(error, res);
   }
 };
+
+// exports.userinfo = async (req, res) => {
+//   const userID = req.header('X-Auth-UserID');
+//   if (!userID) {
+//     return res.status(400).send('User ID is required');
+//   }
+
+//   try {
+//     console.log(httpsAgent);
+//     const response = await axios.get(`${PROXY_ADDR1}/users/${userID}`, {
+//       httpsAgent
+//     });
+//     res.json(response.data);
+//   } catch (error) {
+//     console.error('Error fetching user info:', error);
+//     res.status(500).send('Error fetching user info');
+//   }
+// };
+
+
+// exports.relogin = async (req, res) => {
+//   const { refreshToken, email } = req.body;
+
+//   if (!email) {
+//     return res.status(400).send('Email is required');
+//   }
+
+
+//   try {
+//     const objectId = await getObjectId(email);
+//     console.log(objectId);
+//     if (objectId) {
+
+//       const response = await axios.post(
+//         `${PROXY_ADDR1}/users/${objectId}/checkpw`,
+//         { refreshToken, objectId },
+//       );
+//       console.log(response.data);
+//       res.status(200).send({ objectId });
+//     } else {
+//       res.status(404).send('User not found');
+//     }
+//   } catch (error) {
+//     res.status(500).send('Server error');
+//   }
+
+
+// }

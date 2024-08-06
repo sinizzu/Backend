@@ -5,20 +5,16 @@ services:
     user: root
     ports:
       - 8080:8080
-      - 8443:8443
     networks:
       - db
-    volumes:
-      - ./certs:/app/certs
     environment:
       MONGO_DB_URL: ${MONGO_DB_URL}
       PROXY_TARGET: 'http://node-app:8000'
       PROXY_BLACKLIST: '/api/auth'
-      BACKEND_CERT_DIR: '/app/certs/'
-      BACKEND_CERT_HOSTNAMES: 'proxy'
       ACCESS_TOKEN_LIFETIME: 30
     depends_on:
       - mongo
+      - node-app
 
   mongo:
     image: mongo:4
@@ -28,7 +24,8 @@ services:
       - mongo:/data/db
 
   node-app:
-    image: raminicano/node-app:latest
+    # image: raminicano/node-app:latest
+    build: .
     ports:
       - 8000:8000
     networks:
@@ -42,7 +39,6 @@ services:
 
 volumes:
   mongo:
-  certs:
 
 
 networks:

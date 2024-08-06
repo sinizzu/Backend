@@ -5,7 +5,6 @@ const authRoutes = require('./routes/auth_routes'); // auth 관련 import
 const unauthRoutes = require('./routes/unauth_routes'); // auth 관련 import
 const cors = require('cors');
 const connectDB = require('./config/mongodb');
-const cookieParser = require('cookie-parser');
 const path = require('path');
 
 
@@ -15,29 +14,31 @@ const PORT = process.env.PORT || 8000;
 
 const MAIN_FRONTEND_URL = process.env.MAIN_FRONTEND_URL;
 // const MAIN_BACKEND_URL = process.env.MAIN_BACKEND_URL;
-// const TEST_FRONTEND_URL = process.env.TEST_FRONTEND_URL;
+const TEST_FRONTEND_URL = process.env.TEST_FRONTEND_URL;
 console.log(MAIN_FRONTEND_URL);
 
-// const whitelist = [
-//   MAIN_FRONTEND_URL,
-//   MAIN_BACKEND_URL,
-//   TEST_FRONTEND_URL,
-//   'http://localhost:8000',
-//   'http://localhost:8500',
-//   'http://172.28.54.158:8500'
-// ];
+const whitelist = [
+  MAIN_FRONTEND_URL,
+  // MAIN_BACKEND_URL,
+  TEST_FRONTEND_URL,
+  'http://localhost:8000',
+  'http://localhost:8500',
+];
 
 
 
 const corsOptions = {
-  origin: `${MAIN_FRONTEND_URL}`,
-  credentials: true, // 자격 증명(쿠키, 인증 헤더 등)을 포함
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200,
-  exposedHeaders: ['set-cookie']
+  optionsSuccessStatus: 200
 };
-
 
 
 
@@ -51,7 +52,7 @@ app.options('*', cors(corsOptions)); // Preflight 요청에 대한 응답 처리
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+// app.use(cookieParser());
 
 
 app.use('/api/auth', authRoutes);

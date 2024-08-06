@@ -1,4 +1,6 @@
+// const { connectDB, connectDBUser } = require('../config/mongodb');
 const connectDB = require('../config/mongodb');
+
 
 async function getS3Collection() {
     const db = await connectDB();
@@ -9,6 +11,11 @@ async function getChatCollection() {
     const db = await connectDB();
     return db.collection('chat');
 }
+
+// async function getUserCollection() {
+//     const db = await connectDBUser();
+//     return db.collection('users');
+// }
 
 
 
@@ -63,11 +70,18 @@ async function deleteS3Info(uuid, email) {
 }
 
 
+// async function getObjectId(email) {
+//     const userCollection = await getUserCollection();
+//     const user = await userCollection.findOne({ email: email });
+//     return user ? user._id.toString() : null; // ObjectId를 문자열로 변환하여 반환
+// }
+
 
 module.exports = {
     saveS3Info,
     getS3InfoByEmail,
     saveChatHistory,
     getChatHistoryByUUIDAndEmail,
-    deleteS3Info
+    deleteS3Info,
+    // getObjectId
 };

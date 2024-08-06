@@ -67,6 +67,14 @@
         <button type="submit">Get History</button>
     </form>
 
+
+    <h2>Get User Info</h2>
+    <form id="getUserInfoForm">
+        <input type="text" id="userID" placeholder="User ID" required>
+        <button type="submit">Get User Info</button>
+    </form>
+    <pre id="getUserInfoFormResponse"></pre>
+
     <script>
         async function apiRequest(url, method, body, isFormData = false) {
             const headers = {
@@ -90,6 +98,36 @@
             return response.json();
         }
 
+
+
+        // async function apiRequest2(url, method, headers = {}, body = null) {
+        //     const options = {
+        //         method: method,
+        //         headers: headers,
+        //     };
+        //     if (body) {
+        //         options.body = body;
+        //     }
+        //     const response = await fetch(url, options);
+        //     return response.json();
+        // }
+
+        // function displayResponse(formId, response) {
+        //     const responseElement = document.getElementById(`${formId}Response`);
+        //     responseElement.textContent = JSON.stringify(response, null, 2);
+        // }
+
+        // document.getElementById('getUserInfoForm').addEventListener('submit', async (event) => {
+        //     event.preventDefault();
+        //     const userID = document.getElementById('userID').value;
+        //     const headers = {
+        //         'X-Auth-UserID': userID,
+        //     };
+        //     const response = await apiRequest2('/api/auth/userinfo', 'GET', headers);
+        //     displayResponse('getUserInfoForm', response);
+        // });
+
+
         document.getElementById('signupForm').addEventListener('submit', async (event) => {
             event.preventDefault();
             const email = document.getElementById('signupEmail').value;
@@ -109,26 +147,26 @@
             console.log(response);
         });
 
-        document.getElementById('uploadForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData();
-            const startTime = Date.now();
-            formData.append('file', document.getElementById('uploadFile').files[0]);
-            const response = await fetch('/api/auth/uploadS3', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: formData
-            }).then(res => res.json());
-            const endTime = Date.now();
+        // document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+        //     event.preventDefault();
+        //     const formData = new FormData();
+        //     const startTime = Date.now();
+        //     formData.append('file', document.getElementById('uploadFile').files[0]);
+        //     const response = await fetch('/api/auth/uploadS3', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Authorization': `Bearer ${localStorage.getItem('token')}`
+        //         },
+        //         body: formData
+        //     }).then(res => res.json());
+        //     const endTime = Date.now();
 
-            console.log('File uploaded successfully');
-            console.log('Upload time:', endTime - startTime);
+        //     console.log('File uploaded successfully');
+        //     console.log('Upload time:', endTime - startTime);
 
-            console.log(response);
+        //     console.log(response);
 
-        });
+        // });
 
 
         document.getElementById('presignedUrlForm').addEventListener('submit', async (event) => {

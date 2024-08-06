@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const handleError = require('../utils/handleError');
 const axios = require('axios');
-const { PROXY_ADDR2 } = require('../config/proxyConfig');
+// const { PROXY_ADDR2 } = require('../config/proxyConfig');
+const PROXY_ADDR2 = process.env.PROXY_ADDR2;
 
 const authenticateToken = async (req, res, next) => {
   try {
@@ -23,10 +24,10 @@ const authenticateToken = async (req, res, next) => {
 
     // 상태 코드가 204가 아닌 경우 에러 응답 반환
     return res.status(401).json({ message: 'Unauthorized' });
-  
+
   } catch (error) {
     handleError.handleError(error, res);
-  } 
+  }
 };
 
 module.exports = authenticateToken;

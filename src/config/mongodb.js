@@ -4,6 +4,7 @@ const { MongoClient } = require('mongodb');
 const uri = process.env.MONGO_DB_URL;
 const dbName = 'history';
 
+
 let db;
 let indexCreated = false;
 
@@ -21,6 +22,7 @@ async function connectDB() {
 
     return db;
 }
+
 
 // Connect immediately to log the connection status
 connectDB()
