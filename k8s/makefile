@@ -25,6 +25,7 @@ appdep:
 	kubectl apply -f mongo-pvc.yaml
 	kubectl apply -f role.yaml
 	kubectl apply -f rolebinding.yaml
+	kubectl apply -f summary-deployment.yaml
 	
 
 # Apply configmap configuration
@@ -48,18 +49,21 @@ delsvc:
 	kubectl delete svc backend-service
 	kubectl delete svc external-service
 	kubectl delete svc react-service
+	kubectl delete svc summary-service
 
 # Delete deployments
 deldep:
 	kubectl delete deployment backend-deployment
 	kubectl delete deployment external-deployment
 	kubectl delete deployment react-deployment
+	kubectl delete deployment summary-deployment
 
 # Delete pods
 delpod:
 	kubectl delete pods -l app=backend --grace-period=0 --force
 	kubectl delete pods -l app=external --grace-period=0 --force
 	kubectl delete pods -l app=react --grace-period=0 --force
+	kubectl delete pods -l app=summary --grace-period=0 --force
 
 execnode:
 	$(eval POD_NAME=$(shell kubectl get pods -l app=backend -o jsonpath="{.items[0].metadata.name}"))

@@ -12,9 +12,11 @@ spec:
       labels:
         app: summary
     spec:
+      nodeName: node-hj
       containers:
       - name: summary
         image: wjdguswn1203/summarize:latest
+        # imagePullPolicy: Always
         ports:
         - containerPort: 3500
         env:
@@ -90,3 +92,5 @@ spec:
     - protocol: TCP
       port: 3500
       targetPort: 3500
+      nodePort: 32002
+  type: NodePort

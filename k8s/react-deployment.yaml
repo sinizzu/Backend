@@ -15,6 +15,7 @@ spec:
       containers:
       - name: react
         image: sinzng/frontend:v1
+        imagePullPolicy: Always
         ports:
         - containerPort: 8500
         env:
@@ -33,6 +34,12 @@ spec:
             configMapKeyRef:
               name: app-config
               key: REACT_APP_API_BASE_URL
+        - name: WDS_SOCKET_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: WDS_SOCKET_PORT
+        
 ---
 apiVersion: v1
 kind: Service

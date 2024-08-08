@@ -12,6 +12,8 @@ spec:
       labels:
         app: backend
     spec:
+      nodeSelector:
+        dedicated: backend
       initContainers:
       - name: init-mongo
         image: busybox
@@ -22,19 +24,20 @@ spec:
       containers:
       - name: node-express
         image: raminicano/node-app:latest
+        # imagePullPolicy: Always
         ports:
         - containerPort: 8000
         env:
-        - name: FASTAPI_EXTERNAL_URL
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: FASTAPI_EXTERNAL_URL
-        - name: FASTAPI_SUMMARY_URL
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: FASTAPI_SUMMARY_URL
+        # - name: FASTAPI_EXTERNAL_URL
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: app-config
+        #       key: FASTAPI_EXTERNAL_URL
+        # - name: FASTAPI_SUMMARY_URL
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: app-config
+        #       key: FASTAPI_SUMMARY_URL
         - name: MAIN_FRONTEND_URL
           valueFrom:
             configMapKeyRef:
@@ -50,11 +53,11 @@ spec:
             configMapKeyRef:
               name: app-config
               key: PORT
-        - name: PROXY_ADDR1
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: PROXY_ADDR1
+        # - name: PROXY_ADDR1
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: app-config
+        #       key: PROXY_ADDR1
         - name: PROXY_ADDR2
           valueFrom:
             configMapKeyRef:
@@ -99,10 +102,10 @@ spec:
         image: virtualzone/jwt-auth-proxy:latest
         ports:
         - containerPort: 8080
-        - containerPort: 8443
-        volumeMounts:
-        - name: certs
-          mountPath: /app/certs
+        # - containerPort: 8443
+        # volumeMounts:
+        # - name: certs
+        #   mountPath: /app/certs
         env:
         - name: MONGO_DB_URL
           valueFrom:
@@ -113,10 +116,10 @@ spec:
           value: 'http://node-express:8000'
         - name: PROXY_BLACKLIST
           value: '/api/auth'
-        - name: BACKEND_CERT_DIR
-          value: '/app/certs/'
-        - name: BACKEND_CERT_HOSTNAMES
-          value: 'proxy'
+        # - name: BACKEND_CERT_DIR
+        #   value: '/app/certs/'
+        # - name: BACKEND_CERT_HOSTNAMES
+        #   value: 'proxy'
         - name: ACCESS_TOKEN_LIFETIME
           value: '30'
       - name: mongo
@@ -130,9 +133,9 @@ spec:
       - name: mongo-persistent-storage
         persistentVolumeClaim:
           claimName: mongo-pvc
-      - name: certs
-        hostPath:
-          path: /root/backup/Backend/certs
+      # - name: certs
+      #   hostPath:
+      #     path: /root/backup/Backend/certs
 
 ---
 
@@ -141,6 +144,7 @@ kind: Service
 metadata:
   name: backend-service
 spec:
+  type: NodePort
   selector:
     app: backend
   ports:
@@ -148,6 +152,7 @@ spec:
       protocol: TCP
       port: 8000
       targetPort: 8000
+      nodePort: 32000
     - name: mongo
       protocol: TCP
       port: 27017
@@ -156,8 +161,8 @@ spec:
       protocol: TCP
       port: 8080
       targetPort: 8080
-    - name: https-auth
-      protocol: TCP
-      port: 8443
-      targetPort: 8443
+    # - name: https-auth
+    #   protocol: TCP
+    #   port: 8443
+    #   targetPort: 8443
     
