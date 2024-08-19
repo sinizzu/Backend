@@ -6,3 +6,15 @@ node_modules/
 
 # package-lock
 package-lock.json
+
+# jwt
+jwt
+
+# certs
+certs
+
+# env
+.env
+
+# config
+k8s/configmap.yaml

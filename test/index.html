@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+</head>
+
+<body>
+    <h1>API Test</h1>
+
+    <h2>Signup</h2>
+    <form id="signupForm">
+        <input type="email" id="signupEmail" placeholder="Email" required>
+        <input type="password" id="signupPassword" placeholder="Password" required>
+        <button type="submit">Signup</button>
+    </form>
+
+    <h2>Login</h2>
+    <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <h2>Upload S3</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="uploadFile" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Generate Presigned URL & Upload</h2>
+    <form id="presignedUrlForm" enctype="multipart/form-data">
+        <input type="file" id="presignedFile" name="file" required>
+        <button type="submit">Generate & Upload</button>
+    </form>
+
+    <h2>Save S3</h2>
+    <form id="saveS3Form">
+        <input type="text" id="s3Uri" placeholder="S3 URI" required>
+        <input type="text" id="s3Url" placeholder="S3 URL" required>
+        <input type="email" id="s3Email" placeholder="Email" required>
+        <button type="submit">Save</button>
+    </form>
+
+    <h2>Import S3</h2>
+    <form id="importS3Form">
+        <input type="email" id="importS3Email" placeholder="Email" required>
+        <button type="submit">Import</button>
+    </form>
+
+    <h2>Save Chat</h2>
+    <form id="saveChatForm">
+        <input type="text" id="chatUUID" placeholder="UUID" required>
+        <input type="text" id="chatMessage" placeholder="Message" required>
+        <input type="text" id="chatSender" placeholder="Sender" required>
+        <input type="email" id="chatEmail" placeholder="Email" required>
+        <button type="submit">Save Chat</button>
+    </form>
+
+    <h2>Get Chat History</h2>
+    <form id="getChatHistoryForm">
+        <input type="text" id="historyUUID" placeholder="UUID" required>
+        <input type="email" id="historyEmail" placeholder="Email" required>
+        <input type="text" id="historySender" placeholder="Sender (optional)">
+        <button type="submit">Get History</button>
+    </form>
+
+
+    <h2>Get User Info</h2>
+    <form id="getUserInfoForm">
+        <input type="text" id="userID" placeholder="User ID" required>
+        <button type="submit">Get User Info</button>
+    </form>
+    <pre id="getUserInfoFormResponse"></pre>
+
+    <script>
+        async function apiRequest(url, method, body, isFormData = false) {
+            const headers = {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            };
+            if (!isFormData) {
+                headers['Content-Type'] = 'application/json';
+            }
+
+            const options = {
+                method: method,
+                headers: headers,
+                body: body
+            };
+
+            if (isFormData) {
+                delete options.headers['Content-Type']; // Let the browser set the Content-Type header for FormData
+            }
+
+            const response = await fetch(url, options);
+            return response.json();
+        }
+
+
+
+        // async function apiRequest2(url, method, headers = {}, body = null) {
+        //     const options = {
+        //         method: method,
+        //         headers: headers,
+        //     };
+        //     if (body) {
+        //         options.body = body;
+        //     }
+        //     const response = await fetch(url, options);
+        //     return response.json();
+        // }
+
+        // function displayResponse(formId, response) {
+        //     const responseElement = document.getElementById(`${formId}Response`);
+        //     responseElement.textContent = JSON.stringify(response, null, 2);
+        // }
+
+        // document.getElementById('getUserInfoForm').addEventListener('submit', async (event) => {
+        //     event.preventDefault();
+        //     const userID = document.getElementById('userID').value;
+        //     const headers = {
+        //         'X-Auth-UserID': userID,
+        //     };
+        //     const response = await apiRequest2('/api/auth/userinfo', 'GET', headers);
+        //     displayResponse('getUserInfoForm', response);
+        // });
+
+
+        document.getElementById('signupForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const response = await apiRequest('/api/auth/signup', 'POST', JSON.stringify({ email, password }));
+            console.log(response);
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const response = await apiRequest('/api/auth/login', 'POST', JSON.stringify({ email, password }));
+            if (response.accessToken) {
+                localStorage.setItem('token', response.accessToken);
+            }
+            console.log(response);
+        });
+
+        // document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+        //     event.preventDefault();
+        //     const formData = new FormData();
+        //     const startTime = Date.now();
+        //     formData.append('file', document.getElementById('uploadFile').files[0]);
+        //     const response = await fetch('/api/auth/uploadS3', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Authorization': `Bearer ${localStorage.getItem('token')}`
+        //         },
+        //         body: formData
+        //     }).then(res => res.json());
+        //     const endTime = Date.now();
+
+        //     console.log('File uploaded successfully');
+        //     console.log('Upload time:', endTime - startTime);
+
+        //     console.log(response);
+
+        // });
+
+
+        document.getElementById('presignedUrlForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const startTime = Date.now();
+            // Generate presigned URL
+            const response = await apiRequest('/api/auth/generateS3', 'POST', JSON.stringify({ contentType: 'application/pdf' }));
+            const url = response.url;
+
+            // Upload the file to S3 using the presigned URL
+            const file = document.getElementById('presignedFile').files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const uploadResponse = await fetch(url, {
+                method: 'PUT',
+                body: file
+            });
+
+            const endTime = Date.now();
+
+            console.log('File uploaded successfully');
+            console.log('Upload time:', endTime - startTime);
+
+            if (uploadResponse.ok) {
+                console.log('File uploaded successfully');
+            } else {
+                console.error('File upload failed');
+            }
+        });
+
+        document.getElementById('saveS3Form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const uuid = document.getElementById('s3Uri').value;
+            const url = document.getElementById('s3Url').value;
+            const email = document.getElementById('s3Email').value;
+            const response = await apiRequest('/api/auth/saveS3', 'POST', JSON.stringify({ uuid, url, email }));
+            console.log(response);
+        });
+
+        document.getElementById('importS3Form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('importS3Email').value;
+            const response = await apiRequest(`/api/auth/importS3?email=${email}`, 'GET');
+            console.log(response);
+        });
+
+        document.getElementById('saveChatForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const uuid = document.getElementById('chatUUID').value;
+            const message = document.getElementById('chatMessage').value;
+            const sender = document.getElementById('chatSender').value;
+            const email = document.getElementById('chatEmail').value;
+            const response = await apiRequest('/api/auth/saveChat', 'POST', JSON.stringify({ uuid, message, sender, email }));
+            console.log(response);
+        });
+
+        document.getElementById('getChatHistoryForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const uuid = document.getElementById('historyUUID').value;
+            const email = document.getElementById('historyEmail').value;
+            const sender = document.getElementById('historySender').value;
+            let url = `/api/auth/importChat?uuid=${uuid}&email=${email}`;
+            if (sender) {
+                url += `&sender=${sender}`;
+            }
+            const response = await apiRequest(url, 'GET');
+            console.log(response);
+        });
+    </script>
+</body>
+
+</html>

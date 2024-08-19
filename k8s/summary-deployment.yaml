@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: summary-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: summary
+  template:
+    metadata:
+      labels:
+        app: summary
+    spec:
+      nodeName: node-hj
+      containers:
+      - name: summary
+        image: wjdguswn1203/summarize:latest
+        # imagePullPolicy: Always
+        ports:
+        - containerPort: 3500
+        env:
+        - name: WCS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: WCS_URL
+        - name: WCS_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: WCS_API_KEY
+        - name: HUGGINGFACE_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: HUGGINGFACE_API_KEY
+        - name: OPENAI_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: OPENAI_API_KEY
+        - name: TEXTRAZOR_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: TEXTRAZOR_API_KEY
+        - name: CUSTOM_SEARCH_API
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: CUSTOM_SEARCH_API
+        - name: GOOGLE_CX
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: GOOGLE_CX
+        - name: DEEPL_AUTH_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DEEPL_AUTH_KEY
+        - name: MainFastAPI
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: MainFastAPI
+        - name: MainFrontend
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: MainFrontend
+        - name: HJFrontend
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: HJFrontend
+        - name: JHFrontend
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: JHFrontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: summary-service
+spec:
+  selector:
+    app: summary
+  ports:
+    - protocol: TCP
+      port: 3500
+      targetPort: 3500
+      nodePort: 32002
+  type: NodePort

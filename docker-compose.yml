@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  proxy:
+    image: virtualzone/jwt-auth-proxy
+    user: root
+    ports:
+      - 8080:8080
+    networks:
+      - db
+    environment:
+      MONGO_DB_URL: ${MONGO_DB_URL}
+      PROXY_TARGET: 'http://node-app:8000'
+      PROXY_BLACKLIST: '/api/auth'
+      ACCESS_TOKEN_LIFETIME: 30
+    depends_on:
+      - mongo
+      - node-app
+
+  mongo:
+    image: mongo:4
+    networks:
+      - db
+    volumes:
+      - mongo:/data/db
+
+  node-app:
+    # image: raminicano/node-app:latest
+    build: .
+    ports:
+      - 8000:8000
+    networks:
+      - db
+    env_file:
+      - .env
+    environment:
+      MONGO_DB_URL: ${MONGO_DB_URL}
+    depends_on:
+      - mongo
+
+volumes:
+  mongo:
+
+
+networks:
+  db:
+    driver: bridge
